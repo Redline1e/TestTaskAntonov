@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import type { Flight } from "../types/flight";
 import { getFlights } from "../api/flightsApi";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import StarIcon from "@mui/icons-material/Star";
 import { formatDate } from "../utils/dateUtils";
 
 const FlightsPage: React.FC = () => {
