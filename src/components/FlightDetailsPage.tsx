@@ -12,9 +12,14 @@ import { generateSeats } from "../utils/seatGenerator";
 import { formatDate } from "../utils/dateUtils";
 
 const FlightDetailsPage: React.FC = () => {
+  // Отримуємо параметр id з URL
   const { id } = useParams<{ id: string }>();
+
+  // Стан для збереження даних рейсу
   const [flight, setFlight] = useState<Flight | null>(null);
+  // Стан для індикатора завантаження
   const [loading, setLoading] = useState(true);
+  // Стан для згенерованих місць
   const [seats, setSeats] = useState<Seat[]>([]);
   const dispatch = useDispatch();
 
@@ -22,8 +27,10 @@ const FlightDetailsPage: React.FC = () => {
     if (!id) return;
     (async () => {
       try {
+        // Завантажуємо дані рейсу за ID
         const data = await getFlightById(id);
         setFlight(data);
+        // Генеруємо сітку місць
         setSeats(generateSeats());
       } finally {
         setLoading(false);
@@ -31,12 +38,15 @@ const FlightDetailsPage: React.FC = () => {
     })();
   }, [id]);
 
+  // Показуємо спінер під час завантаження
   if (loading)
     return (
       <Box sx={{ textAlign: "center", mt: 4 }}>
         <CircularProgress />
       </Box>
     );
+
+  // Якщо рейс не знайдено
   if (!flight)
     return (
       <Typography align="center" sx={{ mt: 4 }}>
@@ -57,7 +67,6 @@ const FlightDetailsPage: React.FC = () => {
         {formatDate(flight.arrivalTime)}
       </Typography>
       <Typography align="center">Ціна: ${flight.price}</Typography>
-
       <Box
         sx={{
           display: "grid",
@@ -69,7 +78,9 @@ const FlightDetailsPage: React.FC = () => {
         {seats.map((s) => (
           <IconButton
             key={s.id}
+            // Заборонити клік, якщо місце зайняте
             disabled={s.occupied}
+            // При кліку додаємо квиток у корзину
             onClick={() =>
               dispatch(
                 addTicket({
@@ -80,6 +91,7 @@ const FlightDetailsPage: React.FC = () => {
               )
             }
             sx={{
+              // Колір іконки залежить від зайнятості
               color: s.occupied ? red[500] : green[500],
               flexDirection: "column",
             }}

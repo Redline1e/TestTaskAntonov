@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { type RootState } from "../store";
+import type { RootState } from "../store";
 import { removeTicket, clearCart } from "../store/cartSlice";
 import {
   Box,
@@ -12,11 +12,14 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const Cart: React.FC = () => {
+const CartPage: React.FC = () => {
+  // Отримання списку квитків із Redux
   const tickets = useSelector((state: RootState) => state.cart.tickets);
   const dispatch = useDispatch();
+  // Обчислення загальної вартості
   const total = tickets.reduce((sum, t) => sum + t.price, 0);
 
+  // Якщо квитків нема — відобразити повідомлення
   if (!tickets.length) {
     return (
       <Typography align="center" sx={{ mt: 4 }}>
@@ -54,6 +57,7 @@ const Cart: React.FC = () => {
       <Typography variant="h6" sx={{ mt: 2 }}>
         Разом: ${total}
       </Typography>
+      {/* Кнопка для очищення всього кошика */}
       <Button
         variant="contained"
         color="error"
@@ -66,4 +70,4 @@ const Cart: React.FC = () => {
   );
 };
 
-export default Cart;
+export default CartPage;
