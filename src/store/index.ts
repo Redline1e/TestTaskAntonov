@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./cartSlice";
 
+// Налаштування Redux store з одним ред'юсером cart
 export const store = configureStore({
   reducer: { cart: cartReducer },
 });

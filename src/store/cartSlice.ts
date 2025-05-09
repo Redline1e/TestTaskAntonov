@@ -1,15 +1,22 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-type Ticket = { flightId: string; seat: string; price: number };
+type Ticket = {
+  flightId: string;
+  seat: string;
+  price: number;
+};
 
+// Інтерфейс стану корзини
 interface CartState {
   tickets: Ticket[];
 }
 
+// Ініціальний стан: читаємо з localStorage або встановлюємо порожній масив
 const initialState: CartState = {
   tickets: JSON.parse(localStorage.getItem("cart") || "[]"),
 };
 
+// Створюємо слайс Redux для корзини
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -37,6 +44,5 @@ const cartSlice = createSlice({
     },
   },
 });
-
 export const { addTicket, removeTicket, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;
