@@ -12,20 +12,24 @@ import { useNavigate } from "react-router-dom";
 import type { Flight } from "../types/flight";
 import { getFlights } from "../api/flightsApi";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 import { formatDate } from "../utils/dateUtils";
+import { loadFavorites, saveFavorites } from "../utils/favorites";
 
 const FlightsPage: React.FC = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Сортування за ціною: true = зростання, false = спадання
   const [sortAsc, setSortAsc] = useState(true);
+
+  // Читаємо початковий сет улюблених
+  const [favorites, setFavorites] = useState<Set<string>>(loadFavorites());
+
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       try {
-        // Завантажуємо всі рейси
         const data = await getFlights();
         setFlights(data);
       } catch {
@@ -36,7 +40,6 @@ const FlightsPage: React.FC = () => {
     })();
   }, []);
 
-  // Зміна порядку сортування за ціною
   const handleSort = () => {
     setFlights((prev) =>
       [...prev].sort((a, b) =>
@@ -46,10 +49,15 @@ const FlightsPage: React.FC = () => {
     setSortAsc(!sortAsc);
   };
 
-  // Додавання/видалення рейсу в улюблені
-  const toggleFav = () => {};
+  const toggleFav = (id: string) => {
+    setFavorites((prev) => {
+      const copy = new Set(prev);
+      copy.has(id) ? copy.delete(id) : copy.add(id);
+      saveFavorites(copy);
+      return copy;
+    });
+  };
 
-  // Показ спінера або помилки
   if (loading)
     return (
       <Box sx={{ textAlign: "center", mt: 4 }}>
@@ -68,13 +76,11 @@ const FlightsPage: React.FC = () => {
       <Typography variant="h4" align="center" gutterBottom>
         Доступні рейси
       </Typography>
-      {/* Кнопка сортування */}
       <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
         <Button variant="contained" onClick={handleSort} sx={{ px: 3 }}>
           Сортувати за ціною ({sortAsc ? "зростання" : "спадання"})
         </Button>
       </Box>
-      {/* Контейнер карток */}
       <Box
         sx={{
           display: "flex",
@@ -93,14 +99,16 @@ const FlightsPage: React.FC = () => {
               "&:hover": { boxShadow: 6 },
             }}
           >
-            {/* Кнопка улюблених */}
             <IconButton
               sx={{ position: "absolute", top: 8, right: 8 }}
-              onClick={() => toggleFav()}
+              onClick={() => toggleFav(f.id)}
             >
-              <StarBorderIcon />
+              {favorites.has(f.id) ? (
+                <StarIcon color="warning" />
+              ) : (
+                <StarBorderIcon />
+              )}
             </IconButton>
-            {/* Переходить до деталей при кліку */}
             <CardContent onClick={() => navigate(`/flights/${f.id}`)}>
               <Typography variant="h6" gutterBottom>
                 {f.airline}
